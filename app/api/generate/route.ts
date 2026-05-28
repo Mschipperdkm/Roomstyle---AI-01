@@ -35,8 +35,7 @@ export async function POST(req: NextRequest) {
     //   model: 'dall-e-3',
     //   prompt,
     //   n: 1,
-    //   size: '1792x1024',
-    //   quality: 'hd',
+    //   size: '1024x1024',
     //   style: 'vivid',
     // })
     // const imageUrl = response.data[0].url
@@ -57,11 +56,10 @@ export async function POST(req: NextRequest) {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
     const response = await openai.images.generate({
-      model: (process.env.OPENAI_IMAGE_MODEL as 'dall-e-3') || 'dall-e-3',
+      model: (process.env.OPENAI_IMAGE_MODEL as any) || 'dall-e-2',
       prompt,
       n: 1,
-      size: '1792x1024',
-      quality: 'hd',
+      size: '1024x1024',
     })
 
     const imageUrl = response.data?.[0]?.url
