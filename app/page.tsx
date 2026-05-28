@@ -1,5 +1,4 @@
-Hier is bestand 2 — app/page.tsx. Kopieer alles hieronder:
-typescript'use client'
+'use client'
 
 import { useState, useRef } from 'react'
 import { products, Product } from '@/lib/products'
