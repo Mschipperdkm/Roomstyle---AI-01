@@ -62,7 +62,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Kies een product of upload een foto' }, { status: 400 })
     }
 
-    // Pollinations.ai met Flux model — gratis, betere kwaliteit
     const encodedPrompt = encodeURIComponent(prompt)
     const seed = Math.floor(Math.random() * 1000000)
     const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?model=flux&width=1024&height=768&seed=${seed}&nologo=true`
