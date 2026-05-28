@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getProductById } from '@/lib/products'
 import { getStyleById } from '@/lib/styles'
-import { generateInteriorPrompt, fallbackImages, RoomType } from '@/lib/generatePrompt'
+import { generateInteriorPrompt, RoomType } from '@/lib/generatePrompt'
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,50 +25,13 @@ export async function POST(req: NextRequest) {
 
     const prompt = generateInteriorPrompt(product, style, room)
 
-    // ======================================================
-    // INTEGRATIE PUNT: Vervang dit blok met echte OpenAI DALL-E 3 call
-    // Uncomment de onderstaande code zodra OPENAI_API_KEY beschikbaar is:
-    //
-    // import OpenAI from 'openai'
-    // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-    // const response = await openai.images.generate({
-    //   model: 'dall-e-3',
-    //   prompt,
-    //   n: 1,
-    //   size: '1024x1024',
-    //   style: 'vivid',
-    // })
-    // const imageUrl = response.data[0].url
-    // ======================================================
-
-    // Fallback: gebruik placeholder afbeeldingen per stijl/kamer 
-    const useFallback = !process.env.OPENAI_API_KEY
-
-    if (useFallback) {
-      // Simuleer een loading vertraging voor demo doeleinden
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      const imageUrl = fallbackImages[styleId]?.[room] || fallbackImages['japandi']['woonkamer']
-      return NextResponse.json({ imageUrl, prompt, isFallback: true })
-    }
-
-    // Echte OpenAI call
-    const { default: OpenAI } = await import('openai')
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-    const response = await openai.images.generate({
-      model: (process.env.OPENAI_IMAGE_MODEL as any) || 'dall-e-2',
-      prompt,
-      n: 1,
-      size: '1024x1024',
-    })
-
-    const imageUrl = response.data?.[0]?.url
-
-    if (!imageUrl) {
-      throw new Error('Geen afbeelding ontvangen van OpenAI')
-    }
+    // Gebruik Pollinations.ai — volledig gratis, geen API key nodig
+    const encodedPrompt = encodeURIComponent(prompt)
+    const seed = Math.floor(Math.random() * 1000000)
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&seed=${seed}&nologo=true`
 
     return NextResponse.json({ imageUrl, prompt, isFallback: false })
+
   } catch (error) {
     console.error('[generate] Error:', error)
     return NextResponse.json(
