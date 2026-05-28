@@ -9,7 +9,7 @@ export interface Product {
   description: string
   color?: string
 }
-
+ 
 export const products: Product[] = [
   // ===== LEEN BAKKER =====
   {
@@ -56,6 +56,8 @@ export const products: Product[] = [
     description: '3-deurs kledingkast met strakke deuren en veel opbergruimte.',
     color: 'Mat wit',
   },
+ 
+  // ===== LOODS 5 =====
   {
     id: 'l5-bank-milan',
     name: 'Milan Velvet Bank',
@@ -89,6 +91,8 @@ export const products: Product[] = [
     description: 'Elegante booglamp met messing details en linnen kap. Warme sfeervolle verlichting.',
     color: 'Messing / Linnen',
   },
+ 
+  // ===== IKEA =====
   {
     id: 'ikea-kallax',
     name: 'KALLAX Kast',
@@ -122,6 +126,8 @@ export const products: Product[] = [
     description: 'Eenvoudige en betaalbare salontafel. Licht van gewicht en makkelijk te verplaatsen.',
     color: 'Wit / Zwart',
   },
+ 
+  // ===== WESTWING =====
   {
     id: 'ww-bank-luca',
     name: 'Luca Chesterfield Bank',
@@ -144,6 +150,8 @@ export const products: Product[] = [
     description: 'Ronde eettafel met wit marmer blad en gouden onderstel. Pure luxe.',
     color: 'Wit marmer / Goud',
   },
+ 
+  // ===== HAY =====
   {
     id: 'hay-about-chair',
     name: 'About A Chair AAC22',
@@ -166,6 +174,8 @@ export const products: Product[] = [
     description: 'Speelse salontafel met organisch gevormde poten. Scandinavisch design op zijn best.',
     color: 'Wit / Naturel hout',
   },
+ 
+  // ===== VTWONEN =====
   {
     id: 'vtw-vloerkleed-berber',
     name: 'Berber Vloerkleed',
@@ -188,6 +198,8 @@ export const products: Product[] = [
     description: 'Ruime hoekbank met afgeronde hoeken en diepe zitting. Maximaal comfort.',
     color: 'Taupe',
   },
+ 
+  // ===== BOLIA =====
   {
     id: 'bolia-nancy-bank',
     name: 'Nancy Sofa',
@@ -211,9 +223,9 @@ export const products: Product[] = [
     color: 'Massief eiken',
   },
 ]
-
+ 
 export function getProductById(id: string): Product | undefined {
   return products.find((p) => p.id === id)
 }
-
+ 
 export const stores: string[] = Array.from(new Set(products.map((p) => p.store)))
