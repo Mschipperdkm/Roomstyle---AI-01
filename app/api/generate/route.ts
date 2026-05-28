@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     // const imageUrl = response.data[0].url
     // ======================================================
 
-    // Fallback: gebruik placeholder afbeeldingen per stijl/kamer
+    // Fallback: gebruik placeholder afbeeldingen per stijl/kamer 
     const useFallback = !process.env.OPENAI_API_KEY
 
     if (useFallback) {
