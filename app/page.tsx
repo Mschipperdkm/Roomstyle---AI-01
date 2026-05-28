@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { products, Product } from '@/lib/products'
+import { products, Product, stores } from '@/lib/products'
 import { styles, Style } from '@/lib/styles'
 import { RoomType } from '@/lib/generatePrompt'
 import { ProductCard } from '@/components/ProductCard'
@@ -29,8 +29,19 @@ export default function Home() {
   const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showLeadModal, setShowLeadModal] = useState(false)
+  const [selectedStore, setSelectedStore] = useState<string>('Alle winkels')
+  const [selectedCategory, setSelectedCategory] = useState<string>('Alle categorieën')
   const resultRef = useRef<HTMLDivElement>(null)
   const configRef = useRef<HTMLDivElement>(null)
+
+  const categories = ['Alle categorieën', ...Array.from(new Set(products.map(p => p.category)))]
+  const storeOptions = ['Alle winkels', ...stores]
+
+  const filteredProducts = products.filter(p => {
+    const storeMatch = selectedStore === 'Alle winkels' || p.store === selectedStore
+    const categoryMatch = selectedCategory === 'Alle categorieën' || p.category === selectedCategory
+    return storeMatch && categoryMatch
+  })
 
   const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
     setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
@@ -56,11 +67,7 @@ export default function Home() {
     setGenerationResult(null)
 
     try {
-      const body: any = {
-        styleId: selectedStyle!.id,
-        room: selectedRoom,
-      }
-
+      const body: any = { styleId: selectedStyle!.id, room: selectedRoom }
       if (productMode === 'catalog') {
         body.productId = selectedProduct!.id
       } else if (productMode === 'upload-product') {
@@ -111,10 +118,8 @@ export default function Home() {
         .font-sans { font-family: 'DM Sans', system-ui, sans-serif; }
         .font-display { font-family: 'Playfair Display', Georgia, serif; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         .animate-fade-up { animation: fadeUp 0.6s ease forwards; }
-        .animate-fade-in { animation: fadeIn 0.4s ease forwards; }
         .shimmer-bg { background: linear-gradient(90deg, #F0E8D8 25%, #E4D5BC 50%, #F0E8D8 75%); background-size: 200% 100%; animation: shimmer 2s infinite; }
       `}</style>
 
@@ -147,14 +152,12 @@ export default function Home() {
               AI Interieur Visualisatie
             </span>
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-stone-deep leading-[1.1] mb-6">
-              Visualiseer meubels in
-              <br />
-              <span className="italic text-stone-warm">populaire interieurstijlen</span>
-              <br />
+              Visualiseer meubels van<br />
+              <span className="italic text-stone-warm">Leen Bakker, IKEA, Loods 5</span><br />
               met AI
             </h1>
             <p className="text-base sm:text-lg text-stone-warm/80 font-sans font-light leading-relaxed mb-10 max-w-2xl">
-              Kies een product uit onze catalogus, upload je eigen foto, of visualiseer je eigen kamer in een nieuwe stijl.
+              Kies een product uit onze catalogus of upload je eigen foto. Zie direct hoe het eruitziet in Japandi, Hotel Chic, Scandinavisch en meer.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a href="#tool" className="inline-flex items-center justify-center gap-2 bg-stone-deep text-cream-50 font-sans font-medium px-8 py-4 rounded-2xl hover:bg-stone-mid transition-all hover:scale-[1.01] shadow-lg shadow-stone-deep/20">
@@ -166,11 +169,14 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div className="mt-14 grid grid-cols-3 sm:grid-cols-5 gap-3 opacity-80">
-            {styles.map((s) => (
-              <div key={s.id} className="aspect-[3/4] rounded-2xl overflow-hidden">
-                <img src={s.placeholderImage} alt={s.name} className="w-full h-full object-cover" />
-              </div>
+
+          {/* Store logos */}
+          <div className="mt-12 flex flex-wrap items-center gap-4">
+            <span className="text-xs text-stone-warm/50 font-sans uppercase tracking-wider">Producten van:</span>
+            {stores.map(store => (
+              <span key={store} className="bg-white border border-cream-200 text-stone-warm text-sm font-sans font-medium px-4 py-2 rounded-full shadow-sm">
+                {store}
+              </span>
             ))}
           </div>
         </div>
@@ -178,16 +184,18 @@ export default function Home() {
 
       <section id="tool" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 lg:py-20" ref={configRef}>
 
+        {/* STAP 1 */}
         <div className="mb-16">
           <div className="flex items-baseline gap-3 mb-2">
             <span className="text-xs font-sans text-stone-warm/50 uppercase tracking-widest">Stap 1</span>
             <h2 className="font-serif text-2xl sm:text-3xl text-stone-deep">Kies je startpunt</h2>
           </div>
-          <p className="text-sm text-stone-warm/70 font-sans mb-8">Kies een product uit onze catalogus, upload je eigen product, of upload een foto van je kamer.</p>
+          <p className="text-sm text-stone-warm/70 font-sans mb-8">Kies een product uit onze catalogus of upload je eigen foto.</p>
 
+          {/* Mode selector */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
             {[
-              { id: 'catalog', label: 'Uit de catalogus', emoji: '🛋', desc: 'Kies uit onze voorbeeldproducten' },
+              { id: 'catalog', label: 'Uit de catalogus', emoji: '🛋', desc: 'Leen Bakker, IKEA, Loods 5 en meer' },
               { id: 'upload-product', label: 'Upload een product', emoji: '📦', desc: 'Upload een foto van een meubel' },
               { id: 'upload-room', label: 'Upload je kamer', emoji: '🏠', desc: 'Visualiseer je eigen ruimte' },
             ].map((mode) => (
@@ -207,16 +215,49 @@ export default function Home() {
             ))}
           </div>
 
+          {/* Catalog mode met filters */}
           {productMode === 'catalog' && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isSelected={selectedProduct?.id === product.id}
-                  onSelect={handleProductSelect}
-                />
-              ))}
+            <div>
+              {/* Filters */}
+              <div className="flex flex-wrap gap-3 mb-6">
+                <div>
+                  <select
+                    value={selectedStore}
+                    onChange={(e) => setSelectedStore(e.target.value)}
+                    className="bg-white border border-cream-200 text-stone-deep font-sans text-sm px-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-warm/30 cursor-pointer"
+                  >
+                    {storeOptions.map(store => (
+                      <option key={store} value={store}>{store}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="bg-white border border-cream-200 text-stone-deep font-sans text-sm px-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-stone-warm/30 cursor-pointer capitalize"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat} className="capitalize">{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <span className="text-sm text-stone-warm/50 font-sans self-center">
+                  {filteredProducts.length} producten
+                </span>
+              </div>
+
+              {/* Product grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    isSelected={selectedProduct?.id === product.id}
+                    onSelect={handleProductSelect}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
@@ -245,6 +286,7 @@ export default function Home() {
           )}
         </div>
 
+        {/* STAP 2 */}
         <div className="mb-16">
           <div className="flex items-baseline gap-3 mb-2">
             <span className="text-xs font-sans text-stone-warm/50 uppercase tracking-widest">Stap 2</span>
@@ -254,6 +296,7 @@ export default function Home() {
           <StyleSelector styles={styles} selectedStyle={selectedStyle} onSelect={setSelectedStyle} />
         </div>
 
+        {/* STAP 3 */}
         <div className="mb-16">
           <div className="flex items-baseline gap-3 mb-2">
             <span className="text-xs font-sans text-stone-warm/50 uppercase tracking-widest">Stap 3</span>
@@ -263,7 +306,34 @@ export default function Home() {
           <RoomSelector selectedRoom={selectedRoom} onSelect={setSelectedRoom} />
         </div>
 
+        {/* GENEREER */}
         <div className="mb-16">
+          {canGenerate() && (
+            <div className="bg-white border border-cream-200 rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-4 shadow-sm">
+              {selectedProduct && (
+                <div className="flex items-center gap-3">
+                  <img src={selectedProduct.imageUrl} alt="" className="w-10 h-10 object-cover rounded-lg" />
+                  <div>
+                    <p className="text-xs text-stone-warm/50 font-sans">Product</p>
+                    <p className="text-sm text-stone-deep font-sans font-medium">{selectedProduct.name} — {selectedProduct.store}</p>
+                  </div>
+                </div>
+              )}
+              {selectedStyle && (
+                <div>
+                  <p className="text-xs text-stone-warm/50 font-sans">Stijl</p>
+                  <p className="text-sm text-stone-deep font-sans font-medium">{selectedStyle.emoji} {selectedStyle.name}</p>
+                </div>
+              )}
+              {selectedRoom && (
+                <div>
+                  <p className="text-xs text-stone-warm/50 font-sans">Kamer</p>
+                  <p className="text-sm text-stone-deep font-sans font-medium capitalize">{selectedRoom}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             onClick={handleGenerate}
             disabled={!canGenerate() || isGenerating}
@@ -291,17 +361,14 @@ export default function Home() {
             <div className="mt-8">
               <div className="shimmer-bg aspect-[16/9] rounded-3xl" />
               <p className="text-center text-sm text-stone-warm/60 font-sans mt-4">
-                🎨 AI stelt jouw kamerimpressie samen... (15-30 seconden)
+                🎨 AI genereert jouw kamerimpressie... (15-30 seconden)
               </p>
             </div>
           )}
         </div>
 
         {error && (
-          <div className="mb-8 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
-            <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="mb-8 bg-red-50 border border-red-200 rounded-2xl p-4">
             <p className="text-sm font-sans text-red-700">{error}</p>
           </div>
         )}
@@ -331,40 +398,23 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-cream-50 mb-4">RoomStyle AI voor uw bedrijf</h2>
-            <p className="text-cream-300/70 font-sans font-light max-w-xl mx-auto">Van woonwinkels tot interieurstylisten: verhoog conversie en klantbeleving.</p>
+            <p className="text-cream-300/70 font-sans font-light max-w-xl mx-auto">Van woonwinkels tot interieurstylisten.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {[
-              { emoji: '🏪', title: 'Voor woonwinkels', desc: 'Geef klanten de mogelijkheid om uw producten in hun eigen stijl te visualiseren.', cta: 'Integreer in uw webshop' },
-              { emoji: '🎨', title: 'Voor interieurstylisten', desc: 'Presenteer moodboards en stijlkeuzes razendsnel aan klanten met AI.', cta: 'Gebruik als presentatietool' },
-              { emoji: '🏠', title: 'Voor consumenten', desc: 'Upload je eigen kamer of product en zie direct het resultaat in jouw gewenste stijl.', cta: 'Probeer het gratis' },
+              { emoji: '🏪', title: 'Voor woonwinkels', desc: 'Laat klanten uw producten in hun gewenste stijl visualiseren — direct in uw webshop.' },
+              { emoji: '🎨', title: 'Voor interieurstylisten', desc: 'Genereer razendsnel AI-moodboards voor klantpresentaties.' },
+              { emoji: '🏠', title: 'Voor consumenten', desc: 'Zie meubels van Leen Bakker, IKEA en Loods 5 in jouw gewenste stijl.' },
             ].map((item) => (
-              <div key={item.title} className="bg-white/5 border border-white/10 rounded-2xl p-7 hover:bg-white/10 transition-colors">
+              <div key={item.title} className="bg-white/5 border border-white/10 rounded-2xl p-7">
                 <span className="text-3xl mb-4 block">{item.emoji}</span>
                 <h3 className="font-serif text-xl text-cream-50 mb-3">{item.title}</h3>
                 <p className="text-cream-300/70 font-sans text-sm leading-relaxed mb-5">{item.desc}</p>
-                <button onClick={() => setShowLeadModal(true)} className="text-stone-warm border border-stone-warm/40 hover:bg-stone-warm/10 text-sm font-sans font-medium px-4 py-2 rounded-xl transition-colors">
-                  {item.cta} →
+                <button onClick={() => setShowLeadModal(true)} className="text-stone-warm border border-stone-warm/40 text-sm font-sans font-medium px-4 py-2 rounded-xl transition-colors hover:bg-stone-warm/10">
+                  Meer info →
                 </button>
               </div>
             ))}
-          </div>
-          <div className="border-t border-white/10 pt-14">
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { num: '01', title: 'Meer koopzekerheid', desc: 'Klanten die een product in hun gewenste stijl zien, kopen met meer vertrouwen.' },
-                { num: '02', title: 'Hogere conversie', desc: 'Visuele AI-inspiratie vergroot betrokkenheid en tijd-op-site.' },
-                { num: '03', title: 'Inspiratie met echte producten', desc: 'Anders dan Pinterest: uw klanten zien uw producten in de stijl die bij hen past.' },
-              ].map((item) => (
-                <div key={item.num} className="flex gap-5">
-                  <span className="font-serif text-5xl text-white/10 leading-none flex-shrink-0 mt-1">{item.num}</span>
-                  <div>
-                    <h4 className="font-serif text-lg text-cream-100 mb-2">{item.title}</h4>
-                    <p className="text-cream-300/60 font-sans text-sm leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
