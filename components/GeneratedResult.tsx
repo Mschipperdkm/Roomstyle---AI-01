@@ -30,7 +30,7 @@ export function GeneratedResult({ imageUrl, product, style, room, isFallback, on
             {style.emoji} {style.name}
           </span>
           <span className="bg-white/90 backdrop-blur-sm text-stone-warm text-xs font-sans font-medium px-3 py-1.5 rounded-full shadow-sm">
-            {room}
+            {roomLabels[room]}
           </span>
         </div>
       </div>
@@ -54,7 +54,7 @@ export function GeneratedResult({ imageUrl, product, style, room, isFallback, on
         ) : (
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-200 flex items-center justify-center">
             <div className="text-center">
-              <span className="text-4xl mb-3 block">photos</span>
+              <span className="text-4xl mb-3 block">📸</span>
               <p className="font-serif text-stone-deep text-lg mb-1">Eigen foto gebruikt</p>
               <p className="text-xs text-stone-warm/60 font-sans">Gegenereerd op basis van jouw upload</p>
             </div>
